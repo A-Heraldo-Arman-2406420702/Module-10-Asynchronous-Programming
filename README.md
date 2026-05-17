@@ -63,3 +63,30 @@ Selain itu, di sisi `client.rs`, saya mengubah format `println!` pada saat mener
 **Penjelasan:**
 Pada eksperimen ini, saya mengunduh proyek YewChat (berbasis Rust WebAssembly) dan SimpleWebsocketServer (berbasis Node.js). 
 Server Node.js berjalan di latar belakang untuk menangani koneksi websocket pada port `8080`. Di sisi klien, *framework* Yew me-*render* antarmuka UI ke dalam bentuk HTML dan berkomunikasi dengan server melalui protokol *websocket*. Klien berjalan di browser, dan ketika *user* mengetikkan pesan, pesan tersebut diteruskan ke *server* lalu di-*broadcast* ke semua klien yang terhubung sehingga antarmuka *chat* di-*update* secara *real-time*.
+
+## Experiment 3.2: Be Creative!
+
+![Screenshot Eksperimen 3.2](docs/images/seventh-screenshot.png)
+
+**Penjelasan:**
+Pada eksperimen ini, saya merombak total antarmuka pengguna (UI) YewChat menjadi gaya **Modern Dark Mode**. Perubahan yang saya lakukan pada file `chat.rs` meliputi:
+1. **Sidebar:** Mengubah latar belakang menjadi *dark slate*, menambahkan indikator status *online* berupa titik hijau pada avatar, dan merapikan daftar pengguna.
+2. **Header:** Mengubah teks judul menjadi "Chatty" dengan efek warna gradasi (biru ke ungu).
+3. **Chat Bubbles:** Mengubah tampilan pesan dengan warna biru tebal, sudut melengkung modern (`rounded-2xl`), menambahkan efek bayangan, serta menyisipkan label waktu (*Just now*).
+4. **Input Area:** Mendesain ulang kolom *input* teks agar terlihat lebih elegan dengan tombol kirim bergradasi.
+5. **Keamanan (Anti-Crash):** Saya juga mengganti penggunaan `.unwrap()` yang rawan *error* dengan pengecekan aman (`if let`) dan memberikan *avatar default* jika terjadi keterlambatan sinkronisasi data *user*, sehingga aplikasi WebAssembly tidak akan mengalami *silent crash*.
+
+## Bonus: Rust Websocket server for YewChat!
+
+![Screenshot Eksperimen 3.2](docs/images/eight-screenshot.png)
+
+**Penjelasan Modifikasi & Opini:**
+Awalnya, menghubungkan *client* YewChat dengan server Rust dari Tutorial 2 menyebabkan *client* macet (stuck). Hal ini disebabkan oleh *Contract Mismatch* pada format data JSON. YewChat mengekspektasikan data masuk dengan struktur JSON yang sangat spesifik (membaca `messageType` dan melakukan *parsing* isi `data`).
+
+Untuk mengatasinya, saya memodifikasi `server.rs` dengan menambahkan *library* `serde_json` (khususnya macro `json!`). Server Rust kini:
+1. Membaca setiap pesan masuk dan mendeteksi apakah itu `"register"` atau `"message"`.
+2. Melacak status seluruh *user* yang aktif secara global menggunakan `Arc<Mutex<Vec<String>>>` agar aman digunakan di dalam *thread* Tokio yang berjalan secara *concurrent*.
+3. Memformat ulang pesan balasan ke dalam format JSON yang divalidasi dan membroadcast daftar *user* terbaru setiap kali ada klien yang terhubung atau terputus.
+
+**Opini (Rust vs Javascript/Node.js):**
+Saya lebih memilih versi Rust. Meskipun Javascript (Node.js) terasa jauh lebih cepat dan fleksibel untuk membuat prototipe *websocket* yang bermain dengan JSON mentah di awal, versi Rust memberikan keamanan yang jauh lebih kokoh. Dengan Rust, kita dipaksa memikirkan struktur data (*type-safety*) dan keamanan *concurrency* secara eksplisit sejak awal (seperti penggunaan `Arc` dan `Mutex`). Begitu aplikasinya berjalan, versi Rust jauh lebih kebal terhadap *runtime error* dibandingkan Node.js.
