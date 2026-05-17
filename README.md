@@ -13,9 +13,9 @@ Barulah ketika baris terakhir `executor.run()` dieksekusi, *executor* akan mempr
 
 ## Experiment 1.3: Multiple Spawn and removing drop
 
-![Screenshot Eksperimen 1.2](docs/images/second-screenshot-without-drop-spawner.png)
+![Screenshot Eksperimen 1.3](docs/images/second-screenshot-without-drop-spawner.png)
 
-![Screenshot Eksperimen 1.2](docs/images/second-screenshot-with-drop-spawner.png)
+![Screenshot Eksperimen 1.3](docs/images/second-screenshot-with-drop-spawner.png)
 
 
 **Penjelasan:**
@@ -23,3 +23,15 @@ Barulah ketika baris terakhir `executor.run()` dieksekusi, *executor* akan mempr
 * **Fungsi Spawner:** Bertugas untuk membuat *task* baru (membungkus *future*) dan mengirimkannya ke dalam antrean (*channel* / *queue*) agar nanti bisa dieksekusi.
 * **Fungsi Executor:** Bertugas untuk mengambil *task* dari antrean (*ready queue*) dan menjalankannya (memanggil `poll` pada *future* tersebut) hingga selesai.
 * **Fungsi Drop(spawner):** Ini adalah kunci kenapa program bisa berhenti. `drop(spawner)` akan menutup interaksi *sender* pada *channel*. Jika *spawner* tidak di-*drop*, *executor* akan terus menyala (menunggu dengan asumsi masih ada *task* yang akan dikirim dari *spawner* lain), sehingga program menjadi *hang* dan tidak mau selesai.
+
+## Experiment 2.1: Original code of broadcast chat
+
+![Screenshot Eksperimen 2.1](docs/images/third-screenshot.png)
+
+
+**Cara menjalankan:**
+1. Buka satu terminal dan jalankan `cargo run --bin server` untuk menyalakan WebSocket server di port 2000.
+2. Buka beberapa terminal lain (misalnya 3 terminal) dan jalankan `cargo run --bin client` di masing-masing terminal.
+
+**Apa yang terjadi saat mengetik teks:**
+Ketika sebuah teks diketik di salah satu *client* lalu dikirim (Enter), *client* tersebut akan mengirimkan pesan melalui *websocket connection* ke *server*. *Server* yang bertugas me-*manage* seluruh koneksi akan menerima pesan tersebut, lalu melakukan *broadcast* (mengirim ulang) pesan itu ke seluruh *client* lain yang sedang terhubung ke *server*. Alhasil, *client* lain akan menerima dan menampilkan pesan tersebut secara *real-time* berkat sifat sistem *asynchronous* yang tidak memblokir antrean koneksi.
