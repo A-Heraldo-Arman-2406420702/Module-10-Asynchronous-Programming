@@ -35,3 +35,14 @@ Barulah ketika baris terakhir `executor.run()` dieksekusi, *executor* akan mempr
 
 **Apa yang terjadi saat mengetik teks:**
 Ketika sebuah teks diketik di salah satu *client* lalu dikirim (Enter), *client* tersebut akan mengirimkan pesan melalui *websocket connection* ke *server*. *Server* yang bertugas me-*manage* seluruh koneksi akan menerima pesan tersebut, lalu melakukan *broadcast* (mengirim ulang) pesan itu ke seluruh *client* lain yang sedang terhubung ke *server*. Alhasil, *client* lain akan menerima dan menampilkan pesan tersebut secara *real-time* berkat sifat sistem *asynchronous* yang tidak memblokir antrean koneksi.
+
+## Experiment 2.2: Modifying the websocket port
+
+![Screenshot Eksperimen 2.2](docs/images/fourth-screenshot.png)
+
+**Penjelasan:**
+Untuk mengubah *port* koneksi *websocket* menjadi `8080`, ada dua file yang harus dimodifikasi:
+1. **`src/bin/server.rs`**: Mengubah argumen pada `TcpListener::bind("127.0.0.1:8080")` agar server mendengarkan (*listen*) koneksi masuk pada port `8080`.
+2. **`src/bin/client.rs`**: Mengubah alamat URI tujuan pada `ClientBuilder::from_uri(Uri::from_static("ws://127.0.0.1:8080"))` agar *client* mencoba terhubung ke port yang benar.
+
+Protokol yang digunakan tetap sama, yaitu *websocket* (ditandai dengan awalan `ws://` pada URI di file *client*). Kedua belah pihak harus menggunakan port yang sama agar *handshake* dan komunikasi TCP dapat terjalin.
