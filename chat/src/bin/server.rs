@@ -8,7 +8,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::broadcast::{channel, Sender};
 use tokio_websockets::{Message, ServerBuilder, WebSocketStream};
 
-// Tipe data untuk menyimpan daftar user secara global dan aman di dalam thread
+
 type UserList = Arc<Mutex<Vec<String>>>;
 
 async fn handle_connection(
@@ -33,14 +33,14 @@ async fn handle_connection(
                                     if let Some(name) = parsed["data"].as_str() {
                                         username = name.to_string();
                                         
-                                        // Tambahkan user ke dalam list global
+
                                         {
                                             let mut users_lock = users.lock().unwrap();
                                             if !users_lock.contains(&username) {
                                                 users_lock.push(username.clone());
                                             }
                                             
-                                            // Broadcast ulang list seluruh user yang aktif
+
                                             let response = json!({
                                                 "messageType": "users",
                                                 "dataArray": *users_lock
@@ -50,7 +50,7 @@ async fn handle_connection(
                                     }
                                 } else if parsed["messageType"] == "message" {
                                     if let Some(msg_text) = parsed["data"].as_str() {
-                                        // Yew expect field 'data' berisi stringified JSON
+
                                         let inner_data = json!({
                                             "from": username,
                                             "message": msg_text
@@ -68,7 +68,7 @@ async fn handle_connection(
                         }
                     }
                     Some(Err(err)) => return Err(err.into()),
-                    None => break, // Keluar dari loop jika client terputus
+                    None => break,
                 }
             }
             msg = bcast_rx.recv() => {
@@ -77,7 +77,7 @@ async fn handle_connection(
         }
     }
 
-    // Jika client terputus (disconnect), hapus dari daftar dan update UI client lain
+
     if !username.is_empty() {
         let mut users_lock = users.lock().unwrap();
         users_lock.retain(|u| u != &username);
@@ -94,7 +94,7 @@ async fn handle_connection(
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (bcast_tx, _) = channel(16);
-    // Inisialisasi daftar user kosong yang bisa di-share antar thread
+
     let users: UserList = Arc::new(Mutex::new(Vec::new()));
 
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
@@ -105,7 +105,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         println!("New connection from {addr:?}");
         
         let bcast_tx = bcast_tx.clone();
-        let users = users.clone(); // Clone Arc untuk diberikan ke task baru
+        let users = users.clone();
         
         tokio::spawn(async move {
             let (_req, ws_stream) = ServerBuilder::new().accept(socket).await.unwrap();
