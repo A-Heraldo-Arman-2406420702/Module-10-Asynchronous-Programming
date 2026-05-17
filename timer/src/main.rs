@@ -124,6 +124,7 @@ fn main() {
         println!("Heraldo's Komputer: done!");
     });
 
+    println!("Heraldo's Komputer: hey hey");
 
     drop(spawner);
 
