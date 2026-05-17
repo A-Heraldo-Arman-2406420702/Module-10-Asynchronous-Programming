@@ -55,3 +55,11 @@ Protokol yang digunakan tetap sama, yaitu *websocket* (ditandai dengan awalan `w
 Untuk menampilkan IP dan Port pengirim pada setiap *client*, saya melakukan modifikasi di sisi server. Pada fungsi `handle_connection` di `server.rs`, setiap kali server menerima pesan berupa teks dari *client*, server akan memformat ulang pesan tersebut dengan menambahkan variabel `addr` (bertipe `SocketAddr` yang berisi IP dan Port). Pesan yang sudah diformat (`"{addr}: {text}"`) inilah yang kemudian di-*broadcast* ke *channel*.
 
 Selain itu, di sisi `client.rs`, saya mengubah format `println!` pada saat menerima pesan dari server untuk menyertakan teks `Heraldo's Komputer -`.
+
+## Experiment 3.1: Original code
+
+![Screenshot Eksperimen 3.1](docs/images/sixth-screenshot.png)
+
+**Penjelasan:**
+Pada eksperimen ini, saya mengunduh proyek YewChat (berbasis Rust WebAssembly) dan SimpleWebsocketServer (berbasis Node.js). 
+Server Node.js berjalan di latar belakang untuk menangani koneksi websocket pada port `8080`. Di sisi klien, *framework* Yew me-*render* antarmuka UI ke dalam bentuk HTML dan berkomunikasi dengan server melalui protokol *websocket*. Klien berjalan di browser, dan ketika *user* mengetikkan pesan, pesan tersebut diteruskan ke *server* lalu di-*broadcast* ke semua klien yang terhubung sehingga antarmuka *chat* di-*update* secara *real-time*.
