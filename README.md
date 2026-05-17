@@ -46,3 +46,12 @@ Untuk mengubah *port* koneksi *websocket* menjadi `8080`, ada dua file yang haru
 2. **`src/bin/client.rs`**: Mengubah alamat URI tujuan pada `ClientBuilder::from_uri(Uri::from_static("ws://127.0.0.1:8080"))` agar *client* mencoba terhubung ke port yang benar.
 
 Protokol yang digunakan tetap sama, yaitu *websocket* (ditandai dengan awalan `ws://` pada URI di file *client*). Kedua belah pihak harus menggunakan port yang sama agar *handshake* dan komunikasi TCP dapat terjalin.
+
+## Experiment 2.3: Small changes. Add some information to client
+
+![Screenshot Eksperimen 2.3](docs/images/fifth-screenshot.png)
+
+**Penjelasan Modifikasi:**
+Untuk menampilkan IP dan Port pengirim pada setiap *client*, saya melakukan modifikasi di sisi server. Pada fungsi `handle_connection` di `server.rs`, setiap kali server menerima pesan berupa teks dari *client*, server akan memformat ulang pesan tersebut dengan menambahkan variabel `addr` (bertipe `SocketAddr` yang berisi IP dan Port). Pesan yang sudah diformat (`"{addr}: {text}"`) inilah yang kemudian di-*broadcast* ke *channel*.
+
+Selain itu, di sisi `client.rs`, saya mengubah format `println!` pada saat menerima pesan dari server untuk menyertakan teks `Heraldo's Komputer -`.
